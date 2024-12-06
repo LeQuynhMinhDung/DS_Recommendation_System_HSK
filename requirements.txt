@@ -1,6 +1,3 @@
-streamlit
-numpy
-pandas
-matplotlib
-seaborn
-scikit-learn
+gensim==4.3.3
+pandas==2.2.3
+streamlit==1.37.1
