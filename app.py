@@ -1,18 +1,19 @@
 import streamlit as st
 import pandas as pd
-from   content_based_recommendation import recommend_products as recommend_content_based
 from collaborative_recommend import recommend_products as recommend_collaborative
+from content_based_recommendation import recommend_products as recommend_content_based
 
 # Đường dẫn tệp
-CONTENT_BASED_DATA_FILE = "content_based_preprocessed.csv"
-COLLABORATIVE_FULL_DATA_FILE = "collaborative_full_data.csv"
-COLLABORATIVE_MODEL_FILE = "collaborative_model.pkl"
+CONTENT_BASED_DATA_FILE = "data/content_based_preprocessed.csv"
+COLLABORATIVE_FULL_DATA_PART1 = "data/collaborative_full_data_part1.csv"
+COLLABORATIVE_FULL_DATA_PART2 = "data/collaborative_full_data_part2.csv"
+COLLABORATIVE_MODEL_FILE = "model/collaborative_model.pkl.gz"
 
 # Hình ảnh mặc định
 DEFAULT_IMAGE = "https://via.placeholder.com/150"
 
 # Hiển thị banner và tiêu đề chính
-st.image('hasaki_banner_2.jpg', use_column_width=True)
+st.image('banner/hasaki_banner_2.jpg', use_column_width=True)
 st.title("Hệ thống gợi ý sản phẩm - Hasaki")
 
 # Tabs để chọn giữa hai phương pháp gợi ý
@@ -102,74 +103,74 @@ with tab1:
 with tab2:
     st.subheader("Gợi ý theo người dùng")
 
-    # @st.cache_data
-    # def load_customer_data(full_data_file):
-    #     full_data = pd.read_csv(full_data_file)
-    #     full_data['ma_khach_hang'] = full_data['ma_khach_hang'].astype(str).str.strip()
-    #     return full_data['ma_khach_hang'].unique()
+    @st.cache_data
+    def load_customer_data(data_files):
+        full_data = pd.concat([pd.read_csv(file) for file in data_files])
+        full_data['ma_khach_hang'] = full_data['ma_khach_hang'].astype(str).str.strip()
+        return full_data['ma_khach_hang'].unique()
 
-    # customer_ids = load_customer_data(COLLABORATIVE_FULL_DATA_FILE)
+    customer_ids = load_customer_data([COLLABORATIVE_FULL_DATA_PART1, COLLABORATIVE_FULL_DATA_PART2])
 
-    # # Sử dụng session_state để lưu trạng thái tên và mã khách hàng
-    # if "customer_name" not in st.session_state:
-    #     st.session_state.customer_name = ""
-    # if "customer_id" not in st.session_state:
-    #     st.session_state.customer_id = ""
+    # Sử dụng session_state để lưu trạng thái tên và mã khách hàng
+    if "customer_name" not in st.session_state:
+        st.session_state.customer_name = ""
+    if "customer_id" not in st.session_state:
+        st.session_state.customer_id = ""
 
-    # # Nhập thông tin khách hàng
-    # customer_name = st.text_input(
-    #     "Nhập tên của bạn:",
-    #     value=st.session_state.customer_name
-    # ).strip()
-    # customer_id = st.selectbox(
-    #     "Nhập hoặc chọn mã khách hàng của bạn:",
-    #     options=[""] + list(customer_ids),
-    #     format_func=lambda x: f"Mã khách hàng: {x}" if x else "",
-    #     index=([""] + list(customer_ids)).index(st.session_state.customer_id) if st.session_state.customer_id in customer_ids else 0
-    # )
+    # Nhập thông tin khách hàng
+    customer_name = st.text_input(
+        "Nhập tên của bạn:",
+        value=st.session_state.customer_name
+    ).strip()
+    customer_id = st.selectbox(
+        "Nhập hoặc chọn mã khách hàng của bạn:",
+        options=[""] + list(customer_ids),
+        format_func=lambda x: f"Mã khách hàng: {x}" if x else "",
+        index=([""] + list(customer_ids)).index(st.session_state.customer_id) if st.session_state.customer_id in customer_ids else 0
+    )
 
-    # # Nút đăng nhập
-    # if st.button("Đăng nhập"):
-    #     st.session_state.customer_name = customer_name  # Lưu tên vào session_state
-    #     st.session_state.customer_id = customer_id     # Lưu mã vào session_state
+    # Nút đăng nhập
+    if st.button("Đăng nhập"):
+        st.session_state.customer_name = customer_name  # Lưu tên vào session_state
+        st.session_state.customer_id = customer_id     # Lưu mã vào session_state
 
-    # # Chỉ hiển thị gợi ý sản phẩm khi đã có thông tin
-    # if st.session_state.customer_name and st.session_state.customer_id:
-    #     try:
-    #         # Thực hiện gợi ý sản phẩm
-    #         recommendations = recommend_collaborative(
-    #             COLLABORATIVE_FULL_DATA_FILE,
-    #             COLLABORATIVE_MODEL_FILE,
-    #             st.session_state.customer_id,
-    #             top_n=6
-    #         )
+    # Chỉ hiển thị gợi ý sản phẩm khi đã có thông tin
+    if st.session_state.customer_name and st.session_state.customer_id:
+        try:
+            # Thực hiện gợi ý sản phẩm
+            recommendations = recommend_collaborative(
+                [COLLABORATIVE_FULL_DATA_PART1, COLLABORATIVE_FULL_DATA_PART2],
+                COLLABORATIVE_MODEL_FILE,
+                st.session_state.customer_id,
+                top_n=6
+            )
             
-    #         if not recommendations.empty:
-    #             st.markdown(
-    #                 f"### Các sản phẩm gợi ý dành riêng cho <span style='color:darkgreen; font-style:italic;'>{st.session_state.customer_name}</span>:",
-    #                 unsafe_allow_html=True
-    #             )
+            if not recommendations.empty:
+                st.markdown(
+                    f"### Các sản phẩm gợi ý dành riêng cho <span style='color:darkgreen; font-style:italic;'>{st.session_state.customer_name}</span>:",
+                    unsafe_allow_html=True
+                )
                 
-    #             # Hiển thị sản phẩm gợi ý
-    #             cols = st.columns(3)  # Hiển thị lưới 3 cột
-    #             for idx, (_, row) in enumerate(recommendations.iterrows()):
-    #                 col = cols[idx % 3]
-    #                 with col:
-    #                     st.image(row['hinh_anh'], use_column_width=True, caption=row['ten_san_pham'])
-    #                     gia_ban = row.get('gia_ban', 0)
-    #                     gia_goc = row.get('gia_goc', 0)
-    #                     mo_ta = row.get('mo_ta', "Không có mô tả.")
-    #                     st.markdown(f"**Giá bán:** {gia_ban:,.0f} ₫")
-    #                     st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
-    #                     st.write(f"**Điểm đánh giá trung bình:** {row['diem_trung_binh']:.2f}")
-    #                     with st.expander("Xem mô tả sản phẩm"):
-    #                         st.write(f"{mo_ta}")
-    #                     st.markdown("---")
-    #         else:
-    #             st.warning("Không tìm thấy sản phẩm gợi ý phù hợp.")
-    #     except Exception as e:
-    #         st.error(f"Đã xảy ra lỗi: {e}")
-    # elif st.session_state.customer_name and not st.session_state.customer_id:
-    #     st.warning("Vui lòng nhập hoặc chọn mã khách hàng để gợi ý sản phẩm!")
-    # elif not st.session_state.customer_name and st.session_state.customer_id:
-    #     st.warning("Vui lòng nhập tên của bạn!")
+                # Hiển thị sản phẩm gợi ý
+                cols = st.columns(3)  # Hiển thị lưới 3 cột
+                for idx, (_, row) in enumerate(recommendations.iterrows()):
+                    col = cols[idx % 3]
+                    with col:
+                        st.image(row['hinh_anh'], use_column_width=True, caption=row['ten_san_pham'])
+                        gia_ban = row.get('gia_ban', 0)
+                        gia_goc = row.get('gia_goc', 0)
+                        mo_ta = row.get('mo_ta', "Không có mô tả.")
+                        st.markdown(f"**Giá bán:** {gia_ban:,.0f} ₫")
+                        st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
+                        st.write(f"**Điểm đánh giá trung bình:** {row['diem_trung_binh']:.2f}")
+                        with st.expander("Xem mô tả sản phẩm"):
+                            st.write(f"{mo_ta}")
+                        st.markdown("---")
+            else:
+                st.warning("Không tìm thấy sản phẩm gợi ý phù hợp.")
+        except Exception as e:
+            st.error(f"Đã xảy ra lỗi: {e}")
+    elif st.session_state.customer_name and not st.session_state.customer_id:
+        st.warning("Vui lòng nhập hoặc chọn mã khách hàng để gợi ý sản phẩm!")
+    elif not st.session_state.customer_name and st.session_state.customer_id:
+        st.warning("Vui lòng nhập tên của bạn!")

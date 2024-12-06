@@ -60,3 +60,4 @@ def recommend_products(product_id, df, weight_content=0.7, weight_rating=0.3, to
     df_recommendations = pd.DataFrame(top_similar_products)
     
     return df_recommendations
+
