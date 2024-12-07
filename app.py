@@ -75,8 +75,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Render the banner
-st.markdown('<div class="banner"></div>', unsafe_allow_html=True)
+# Hiển thị banner
+banner_path = "banner/hasaki_banner.png"  # Đường dẫn cục bộ
+
+st.image(
+    banner_path,
+    use_column_width=True,  # Tự động căn chỉnh theo chiều rộng của trang
+    caption=None  # Không hiển thị chú thích
+)
 
 # Sidebar thông tin nhóm
 st.sidebar.title("Thông tin nhóm thực hiện")
