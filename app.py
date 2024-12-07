@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
-from collaborative_system.collaborative_recommend import recommend_products as recommend_collaborative
-from content_based.content_based_recommendation import recommend_products as recommend_content_based
+from collaborative_recommend import recommend_products as recommend_collaborative
+from content_based_recommendation import recommend_products as recommend_content_based
 
 # Đường dẫn tệp
-CONTENT_BASED_DATA_FILE = "content_based/content_based_preprocessed.csv"
-COLLABORATIVE_FULL_DATA_PART1 = "collaborative_system/data/collaborative_full_data_part1.csv"
-COLLABORATIVE_FULL_DATA_PART2 = "collaborative_system/data/collaborative_full_data_part2.csv"
-COLLABORATIVE_MODEL_FILE = "collaborative_system/model/collaborative_model.pkl.gz"
+CONTENT_BASED_DATA_FILE = "data/content_based_preprocessed.csv"
+COLLABORATIVE_FULL_DATA_PART1 = "data/collaborative_full_data_part1.csv"
+COLLABORATIVE_FULL_DATA_PART2 = "data/collaborative_full_data_part2.csv"
+COLLABORATIVE_MODEL_FILE = "model/collaborative_model.pkl.gz"
 
 # Set page configuration
 st.set_page_config(
