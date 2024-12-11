@@ -12,7 +12,7 @@ COLLABORATIVE_MODEL_FILE = "model/collaborative_model.pkl.gz"
 # Set page configuration
 st.set_page_config(
     page_title="Hasaki Recommendation System",
-    page_icon="💖",
+    page_icon="💄",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -232,7 +232,9 @@ elif page == "Recommendation Process":
 
     # Tab Content-Based Filtering
     with tab2:
-        st.subheader("Content-Based Filtering")
+        # Streamlit layout
+        st.title("Content-Based Filtering: Preprocessing and Analysis")
+
         st.write("### Các bước tiền xử lý:")
         st.markdown("""
         1. **Đọc dữ liệu từ các tệp CSV:**
@@ -249,9 +251,6 @@ elif page == "Recommendation Process":
         san_pham_preprocessed_path = "data/content_based_preprocessed.csv"
         san_pham_df = pd.read_csv(san_pham_path)
         san_pham_preprocessed_df = pd.read_csv(san_pham_preprocessed_path)
-
-        # Streamlit layout
-        st.title("Content-Based Filtering: Preprocessing and Analysis")
 
         # Display raw data
         st.write("### Dữ liệu sản phẩm gốc:")
