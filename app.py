@@ -3,6 +3,14 @@ import pandas as pd
 from collaborative_recommend import recommend_products as recommend_collaborative
 from content_based_recommendation import recommend_products as recommend_content_based
 
+# Function chuyển đổi điểm đánh giá thành ngôi sao màu vàng.
+def render_stars(rating):
+            # Chuyển đổi điểm đánh giá thành chuỗi ngôi sao.
+            full_star = '<span style="color: gold; font-size: 1.5em;">★</span>'  # Ngôi sao vàng
+            empty_star = '<span style="color: lightgray; font-size: 1.5em;">☆</span>'  # Ngôi sao trống
+            stars = full_star * int(rating) + empty_star * (5 - int(rating))
+            return stars
+
 # Đường dẫn tệp
 CONTENT_BASED_DATA_FILE = "data/content_based_preprocessed.csv"
 COLLABORATIVE_FULL_DATA_PART1 = "data/collaborative_full_data_part1.csv"
@@ -80,17 +88,18 @@ st.sidebar.title("Thông tin nhóm thực hiện")
 st.sidebar.write("""#### Thành viên thực hiện:
 - Lê Quỳnh Minh Dung
 - Nguyễn Thùy Trang""")
-st.sidebar.write("""#### Giảng viên hướng dẫn: Khuất Thùy Phương""")
-st.sidebar.write("""#### Thời gian thực hiện: 12/2024""")
+st.sidebar.write("""#### Giảng viên hướng dẫn: 
+- Cô Khuất Thùy Phương""")
+st.sidebar.write("""#### Thời gian thực hiện: 16/12/2024""")
 
-st.sidebar.title("Navigation")
+st.sidebar.title("Menu")
 page = st.sidebar.radio(
-    "Select a page:", 
-    ["Introduction", "Recommendation Process", "Recommendation System"]
+    "Lựa chọn trang:", 
+    ["Giới thiệu", "Quy trình xây dựng hệ thống", "Hệ thống gợi ý sản phẩm"]
 )
 
-# Page 1: Introduction
-if page == "Introduction":
+# Page 1: Giới thiệu
+if page == "Giới thiệu":
     # Hiển thị banner
     st.title("Chào mừng đến với Hasaki.vn!")
     
@@ -102,7 +111,7 @@ if page == "Introduction":
 
     # Cột 2: Hiển thị phần "Về Hasaki"
     with col2:
-        st.subheader("Về Hasaki.vn 💄")
+        st.subheader("💄 Về **`Hasaki.vn`**")
         st.write("""
             Hasaki.vn cam kết mang đến những sản phẩm làm đẹp và chăm sóc da tốt nhất cho khách hàng.
             Với trọng tâm là chất lượng và sự hài lòng của khách hàng, Hasaki hướng đến việc làm đẹp trở nên dễ tiếp cận với mọi người.
@@ -113,13 +122,13 @@ if page == "Introduction":
         Hệ thống gợi ý (Recommend system) của chúng tôi được thiết kế nhằm:
         - 🛍️ Giúp khách hàng của chúng tôi khám phá các sản phẩm phù hợp với sở thích của mình.
         - 💡 Cải thiện trải nghiệm mua sắm bằng cách gợi ý các sản phẩm liên quan.
-        - 📊 Ứng dụng các thuật toán tiên tiến như Content-Based Filtering và Collaborative Filtering để mang lại gợi ý cá nhân hóa.
+        - 📊 Ứng dụng các thuật toán tiên tiến như **`Content-Based Filtering`** và **`Collaborative Filtering`** để mang lại gợi ý cá nhân hóa.
     """)
     st.markdown("<br>", unsafe_allow_html=True)  # Thêm khoảng trống
-    st.image("banner/images.png", use_column_width=True, caption="Mang đến trải nghiệm làm đẹp tuyệt vời")
+    st.image("banner/images.png", use_column_width=True, width=800, caption="Mang đến trải nghiệm làm đẹp tuyệt vời")
 
-# Page 2: Recommendation Process
-elif page == "Recommendation Process":
+# Page 2: Quy trình xây dựng hệ thống
+elif page == "Quy trình xây dựng hệ thống":
     st.title("Quy trình xây dựng Recommendation System")
     st.write("""
         Quy trình xây dựng hệ thống gợi ý tại Hasaki.vn được chia thành hai phương pháp chính:
@@ -217,7 +226,7 @@ elif page == "Recommendation Process":
                     - **`gia_goc`**: Giá gốc (nếu có).
                     - **`hinh_anh`**: URL hình ảnh sản phẩm.
                 3. **Loại bỏ trùng lặp:** Sản phẩm được lọc dựa trên `ma_san_pham`.
-                4. **Đầu ra:** Lưu dữ liệu đã xử lý vào file San_pham_new.csv để merge chung với file gốc là San_pham.csv dựa trên cột `ma_san_pham`.
+                4. **Đầu ra:** Lưu dữ liệu đã xử lý vào file **`San_pham_new.csv`** để merge chung với file gốc là **`San_pham.csv`** dựa trên cột `ma_san_pham`.
                 5. **Thời gian nghỉ (sleep):** Giữa mỗi lần cào một trang, chương trình nghỉ 2 giây để tránh bị chặn.
         """)
 
@@ -225,6 +234,7 @@ elif page == "Recommendation Process":
         # Hiển thị dữ liệu mẫu
         try:
             df_sample = pd.read_csv('data/San_pham_new.csv').head()
+            df_sample['ma_san_pham'] = df_sample['ma_san_pham'].astype(str)
             st.dataframe(df_sample)
         except FileNotFoundError:
             st.warning("Không tìm thấy file `San_pham_new.csv`. Vui lòng chạy mã cào dữ liệu trước.")
@@ -233,27 +243,36 @@ elif page == "Recommendation Process":
     # Tab Content-Based Filtering
     with tab2:
         # Streamlit layout
-        st.title("Content-Based Filtering: Preprocessing and Analysis")
+        st.title("Content-Based Filtering: Quy trình xây dựng và phân tích")
 
         st.write("### Các bước tiền xử lý:")
         st.markdown("""
         1. **Đọc dữ liệu từ các tệp CSV:**
             - **San_pham.csv:** Chứa thông tin sản phẩm (tên, mô tả, giá, điểm đánh giá...).
             - **Danh_gia.csv:** Chứa đánh giá của khách hàng.
-        2. **Loại bỏ stopwords và làm sạch dữ liệu (Tonkenize).**
-        3. **Tính toán đặc trưng:**
-            - Tạo nội dung phong phú hơn bằng cách kết hợp tên, mô tả sản phẩm và phân loại để tạo nội dung phong phú hơn.
-            - Tính toán điểm tổng hợp cho từng sản phẩm bằng cách kết hợp điểm tương tự nội dung (similarity score) và điểm đánh giá trung bình (average rating). Dùng điểm tổng hợp này để xác định các sản phẩm tương tự nhất nhưng vẫn đảm bảo ưu tiên các sản phẩm có đánh giá tốt hơn.
+        2. **Làm sạch dữ liệu và tiền xử lý:**
+            - Loại bỏ stopwords, ký tự đặc biệt (Tokenize).
+            - Kết hợp tên sản phẩm, mô tả và phân loại để tạo nội dung phong phú hơn.
+        3. **Trích xuất đặc trưng:**
+            - Sử dụng **`Gensim`** với **`TF-IDF`** để tính toán mức độ quan trọng của từ trong mô tả sản phẩm.
+            - Tạo ma trận tương tự (**`ma trận sparse`**) dựa trên nội dung.
+            - Tính **`so_sao_trung_binh`** cho mỗi sản phẩm bằng cách nhóm theo **`ma_san_pham`** từ bảng **`Danh_gia.csv`**.
+            - Gộp thông tin **`so_sao_trung_binh`** vào file **`San_pham.csv`** để tạo một bảng tổng hợp.
+        4. **Tính toán đặc trưng:**
+            - Tính toán điểm tổng hợp cho từng sản phẩm bằng cách kết hợp điểm tương tự nội dung (**`similarity score`**) và điểm đánh giá trung bình (**`average rating`**). Dùng điểm tổng hợp này để xác định các sản phẩm tương tự nhất nhưng vẫn đảm bảo ưu tiên các sản phẩm có đánh giá tốt hơn.
+            - Sắp xếp và trả về các sản phẩm phù hợp nhất.
         """)
 
         # Load dữ liệu
         san_pham_path = "data/san_pham_updated.csv"
         san_pham_preprocessed_path = "data/content_based_preprocessed.csv"
         san_pham_df = pd.read_csv(san_pham_path)
+        san_pham_df['ma_san_pham'] = san_pham_df['ma_san_pham'].astype(str)
         san_pham_preprocessed_df = pd.read_csv(san_pham_preprocessed_path)
+        san_pham_preprocessed_df['ma_san_pham'] = san_pham_preprocessed_df['ma_san_pham'].astype(str)
 
         # Display raw data
-        st.write("### Dữ liệu sản phẩm gốc:")
+        st.write("### Dữ liệu gốc:")
         st.dataframe(san_pham_df[['ma_san_pham', 'ten_san_pham', 'mo_ta', 'diem_trung_binh']].head())
 
         # Display tokenized data
@@ -262,7 +281,7 @@ elif page == "Recommendation Process":
 
         # Token distribution
         st.write("### Phân phối số lượng từ trong mô tả sản phẩm:")
-        st.image("banner/distribution.png", use_column_width=True, caption="")
+        st.image("banner/distribution.png", use_column_width=False, width=650, caption="")
 
         st.markdown("""
         **Nhận xét:**
@@ -273,7 +292,7 @@ elif page == "Recommendation Process":
 
         # Relationship between token count and average rating
         st.write("### Quan hệ giữa điểm đánh giá và độ dài mô tả:")
-        st.image("banner/relationship.png", use_column_width=True, caption="")
+        st.image("banner/relationship.png", use_column_width=False, width=650, caption="")
 
         st.markdown("""
         **Nhận xét:**
@@ -284,7 +303,7 @@ elif page == "Recommendation Process":
 
         # Correlation heatmap
         st.write("### Heatmap tương quan:")
-        st.image("banner/heatmap.png", use_column_width=True, caption="")
+        st.image("banner/heatmap.png", use_column_width=False, width=650, caption="")
 
         st.markdown("""
         **Nhận xét:**
@@ -294,7 +313,7 @@ elif page == "Recommendation Process":
 
         # Top 10 most frequent words
         st.write("### Top 10 từ phổ biến nhất trong mô tả sản phẩm:")
-        st.image("banner/frequent_words.png", use_column_width=True, caption="")
+        st.image("banner/frequent_words.png", use_column_width=False, width=650, caption="")
 
         st.markdown("""
         **Nhận xét:**
@@ -305,26 +324,70 @@ elif page == "Recommendation Process":
 
         # Tab Collaborative Filtering
         with tab3:
-            st.subheader("Collaborative Filtering")
-            st.write("### Bước 1: Xử lý dữ liệu khách hàng và sản phẩm")
-            st.code("""
-            import pandas as pd
+            # Tiêu đề
+            st.title("Collaborative Filtering: Quy trình xây dựng và phân tích")
 
-            def preprocess_data(input_file, output_file):
-                # Code xử lý dữ liệu Collaborative Filtering
-                pass
-                    """, language="python")
-            st.write("### Bước 2: Huấn luyện mô hình Collaborative Filtering")
-            st.code("""
-            from surprise import Dataset, KNNBaseline
+            st.markdown("""
+            1. **Xử lý dữ liệu:**
+                - Đọc dữ liệu từ file đánh giá khách hàng (**`Danh_gia.csv`**).
+                - Loại bỏ dữ liệu trùng lặp dựa trên khách hàng, sản phẩm và số sao.
+                - Lọc giữ lại đánh giá gần nhất cho mỗi khách hàng và sản phẩm.
+                - Lưu dữ liệu đã xử lý vào file mới.
+            2. **Phân tích dữ liệu:**
+                - Khám phá phân phối số sao, số lượt đánh giá trên mỗi sản phẩm và mỗi khách hàng.
+                - Lọc các sản phẩm và người dùng có ít đánh giá để giảm tính đa chiều.
+            3. **Huấn luyện mô hình:**
+                - Sử dụng thuật toán **`KNNBaseline`** từ thư viện **`Surprise`** để xây dựng mô hình dự đoán đánh giá sao của khách hàng cho các sản phẩm chưa đánh giá.
+                - Lưu mô hình đã huấn luyện vào file để sử dụng cho gợi ý.
+            4. **Gợi ý sản phẩm:**
+                - Dựa trên mô hình đã huấn luyện, dự đoán điểm số và đề xuất các sản phẩm phù hợp.
+            """)
 
-            def train_model(data_file, model_file):
-                # Code huấn luyện Collaborative Filtering
-                pass
-                    """, language="python")
+            st.write("### Dữ liệu trước và sau khi xử lý:")
+            # Đọc dữ liệu
+            raw_data = pd.read_csv("data/Danh_gia.csv")
+            processed_data = pd.read_csv("data/collaborative_full_data_part1.csv")
 
-# Page 3: Recommendation System
-elif page == "Recommendation System":
+            # Hiển thị dữ liệu trước xử lý
+            st.write("#### Dữ liệu gốc:")
+            st.dataframe(raw_data.head())
+
+            # Hiển thị dữ liệu sau xử lý
+            st.write("#### Dữ liệu sau xử lý:")
+            st.dataframe(processed_data.head())
+
+            # Biểu đồ phân phối số sao
+            st.write("### Phân phối số sao:")
+            st.image("banner/star_distribution.png", use_column_width=False, width=650, caption="")
+
+            st.markdown("""
+            **Nhận xét:**
+            - Hơn 90% số lượt đánh giá là tích cực (từ 4 sao trở lên).
+            - Các sản phẩm có đánh giá thấp chiếm tỷ lệ rất nhỏ.
+            """)
+
+            # Biểu đồ phân phối số lượt đánh giá trên mỗi sản phẩm
+            st.write("### Phân phối số lượt đánh giá trên mỗi sản phẩm:")
+            st.image("banner/product_distribution.png", use_column_width=False, width=650, caption="")
+
+            st.markdown("""
+            **Nhận xét:**
+            - Đa phần các sản phẩm có số lượng đánh giá dưới 30 lượt.
+            - Một số ít sản phẩm được đánh giá rất nhiều (~ 5 sản phẩm), lên đến 300 lượt.
+            """)
+
+            # Biểu đồ phân phối số lượt đánh giá trên mỗi khách hàng
+            st.write("### Phân phối số lượt đánh giá trên mỗi khách hàng:")
+            st.image("banner/customer_distribution.png", use_column_width=False, width=650, caption="")
+
+            st.markdown("""
+            **Nhận xét:**
+            - Đa phần khách hàng đánh giá dưới 25 lượt.
+            - Một số khách hàng tích cực đánh giá lên đến 70 lượt.
+            """)
+
+# Page 3: Hệ thống gợi ý sản phẩm
+elif page == "Hệ thống gợi ý sản phẩm":
     # Hiển thị banner
     banner_path = "banner/hasaki_banner.png"  # Đường dẫn cục bộ
 
@@ -341,8 +404,6 @@ elif page == "Recommendation System":
 
     # Tab 1: Content-Based Filtering
     with tab1:
-        st.subheader("Content-based filtering")
-
         # Đọc dữ liệu sản phẩm
         df_products = pd.read_csv(CONTENT_BASED_DATA_FILE)
         df_products['ten_san_pham'] = df_products['ten_san_pham'].astype(str).fillna('')
@@ -360,7 +421,7 @@ elif page == "Recommendation System":
 
         # Lọc sản phẩm dựa trên lựa chọn
         filtered_products = df_products[df_products['ten_san_pham'] == selected_product_name] if selected_product_name else pd.DataFrame()
-
+        
         # Hiển thị sản phẩm đã chọn
         if not filtered_products.empty:
             selected_product_data = filtered_products.iloc[0]
@@ -379,9 +440,15 @@ elif page == "Recommendation System":
                 tab_info, tab_desc = st.tabs(["Thông tin chi tiết", "Mô tả sản phẩm"])
                 with tab_info:
                     st.markdown(f"**Mã sản phẩm:** {selected_product_data['ma_san_pham']}")
-                    st.markdown(f"**Giá bán:** <span style='color: red;'>{gia_ban:,.0f} ₫</span>", unsafe_allow_html=True)
-                    st.markdown(f"<span style='text-decoration: line-through; color: gray;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
-                    st.markdown(f"**Điểm đánh giá:** {selected_product_data.get('diem_trung_binh', 'Không có thông tin')}")
+                    st.markdown(f"**Giá bán:** <span style='color: red; font-size: 1.2em;'>{gia_ban:,.0f} ₫</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
+                    # Hiển thị điểm đánh giá dưới dạng ngôi sao
+                    rating = selected_product_data['diem_trung_binh']  # Lấy điểm đánh giá trung bình
+                    stars = render_stars(rating)
+                    st.markdown(
+                        f"**Điểm đánh giá:** {stars} <span style='font-size: 1.0em;'>({rating:.1f})</span>", 
+                        unsafe_allow_html=True
+                    )
                 with tab_desc:
                     st.markdown(selected_product_data.get('mo_ta', "Không có mô tả."))
 
@@ -403,22 +470,38 @@ elif page == "Recommendation System":
                 with col:
                     st.image(
                         row['hinh_anh'], 
-                        caption=row['ten_san_pham'], 
-                        use_column_width=False,  # Tắt tự động căn chỉnh
+                        use_column_width=True,  # Căn chỉnh theo độ rộng
                         width=350  # Đặt chiều rộng cố định
                     )
+                    st.markdown(
+                        f"<h4 style='font-size:18px; font-weight:bold; text-align:center;'>{row['ten_san_pham']}</h4>", 
+                        unsafe_allow_html=True)
                     st.markdown(f"**Mã sản phẩm:** <span style='color: blue;'>{row.get('ma_san_pham', 'Không có thông tin')}</span>", unsafe_allow_html=True)
-                    st.markdown(f"**Giá bán:** <span style='color: red;'>{row.get('gia_ban', 'Không có thông tin')} ₫</span>", unsafe_allow_html=True)
-                    st.markdown(f"<span style='text-decoration: line-through; color: gray;'>Giá gốc: {row.get('gia_goc', 'Không có thông tin')} ₫</span>", unsafe_allow_html=True)
-                    st.markdown(f"**Điểm đánh giá:** {row.get('average_rating', 'Không có thông tin')}")
+
+                    # Lấy giá trị và định dạng giá bán
+                    gia_ban = row.get('gia_ban', 'Không có thông tin')
+                    gia_ban_formatted = f"{int(gia_ban):,}" if isinstance(gia_ban, (int, float)) and not pd.isnull(gia_ban) else gia_ban
+
+                    # Lấy giá trị và định dạng giá gốc
+                    gia_goc = row.get('gia_goc', 'Không có thông tin')
+                    gia_goc_formatted = f"{int(gia_goc):,}" if isinstance(gia_goc, (int, float)) and not pd.isnull(gia_goc) else gia_goc
+
+                    st.markdown(f"**Giá bán:** <span style='color: red; font-size: 1.2em;'>{gia_ban_formatted} ₫</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc_formatted} ₫</span>", unsafe_allow_html=True)
+
+                    # Hiển thị điểm đánh giá dưới dạng ngôi sao
+                    rating = row.get('average_rating', 0)  # Lấy điểm đánh giá trung bình
+                    stars = render_stars(rating)
+                    st.markdown(
+                        f"**Điểm đánh giá:** {stars} <span style='font-size: 1.0em;'>({rating:.1f})</span>", 
+                        unsafe_allow_html=True
+                    )
                     with st.expander("Xem mô tả sản phẩm"):
                         st.write(row.get('mo_ta', "Không có mô tả."))
                     st.markdown("---")
 
     # Tab 2: Collaborative Filtering
     with tab2:
-        st.subheader("Collaborative filtering")
-
         @st.cache_data
         def load_customer_data(data_files):
             full_data = pd.concat([pd.read_csv(file) for file in data_files])
@@ -463,7 +546,7 @@ elif page == "Recommendation System":
                 
                 if not recommendations.empty:
                     st.markdown(
-                        f"### Các sản phẩm gợi ý dành riêng cho <span style='color:darkgreen; font-style:italic;'>{st.session_state.customer_name}</span>:",
+                        f"### Các sản phẩm gợi ý dành riêng cho <span style='color:darkgreen; font-weight:bold;'>`{st.session_state.customer_name}`</span>:",
                         unsafe_allow_html=True
                     )
                     
@@ -472,13 +555,21 @@ elif page == "Recommendation System":
                     for idx, (_, row) in enumerate(recommendations.iterrows()):
                         col = cols[idx % 3]
                         with col:
-                            st.image(row['hinh_anh'], use_column_width=True, caption=row['ten_san_pham'])
+                            st.image(row['hinh_anh'], use_column_width=True)
+                            st.markdown(f"<h4 style='font-size:18px; font-weight:bold; text-align:center;'>{row['ten_san_pham']}</h4>", 
+                                        unsafe_allow_html=True)
+                            st.markdown(f"**Mã sản phẩm:** <span style='color: blue;'>{row.get('ma_san_pham', 'Không có thông tin')}</span>", unsafe_allow_html=True)
                             gia_ban = row.get('gia_ban', 0)
                             gia_goc = row.get('gia_goc', 0)
                             mo_ta = row.get('mo_ta', "Không có mô tả.")
-                            st.markdown(f"**Giá bán:** {gia_ban:,.0f} ₫")
+                            st.markdown(f"<strong>Giá bán:</strong> <span style='color: red; font-size: 1.2em;'>{gia_ban:,.0f} ₫</span>", unsafe_allow_html=True)
                             st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
-                            st.write(f"**Điểm đánh giá trung bình:** {row['diem_trung_binh']:.2f}")
+                            rating = row.get('diem_trung_binh', 0)  # Lấy điểm đánh giá trung bình
+                            stars = render_stars(rating)
+                            st.markdown(
+                                f"**Điểm đánh giá:** {stars} <span style='font-size: 1.0em;'>({rating:.1f})</span>", 
+                                unsafe_allow_html=True
+                            )
                             with st.expander("Xem mô tả sản phẩm"):
                                 st.write(f"{mo_ta}")
                             st.markdown("---")
