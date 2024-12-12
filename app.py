@@ -90,9 +90,9 @@ st.sidebar.write("""#### Thành viên thực hiện:
 - Nguyễn Thùy Trang""")
 st.sidebar.write("""#### Giảng viên hướng dẫn: 
 - Cô Khuất Thùy Phương""")
-st.sidebar.write("""#### Thời gian thực hiện: 16/12/2024""")
+st.sidebar.write("""#### 📈 Thời gian báo cáo: 16/12/2024""")
 
-st.sidebar.title("Menu")
+st.sidebar.title("Danh mục")
 page = st.sidebar.radio(
     "Lựa chọn trang:", 
     ["Giới thiệu", "Quy trình xây dựng hệ thống", "Hệ thống gợi ý sản phẩm"]
@@ -107,7 +107,7 @@ if page == "Giới thiệu":
 
     # Cột 1: Hiển thị logo
     with col1:
-        st.image("banner/Logo.png", use_column_width=False, width=200, caption="")
+        st.image("banner/Logo.png", use_column_width=True, width=100, caption="")
 
     # Cột 2: Hiển thị phần "Về Hasaki"
     with col2:
@@ -129,7 +129,11 @@ if page == "Giới thiệu":
 
 # Page 2: Quy trình xây dựng hệ thống
 elif page == "Quy trình xây dựng hệ thống":
-    st.title("Quy trình xây dựng Recommendation System")
+    st.markdown(f'''
+    <div class="header-title">
+        <h1 style="color: #2f6e51; margin-bottom: 10px; text-align: center;">🌿 Quy trình xây dựng<br>Recommendation System</h1>
+    </div>
+    ''', unsafe_allow_html=True)
     st.write("""
         Quy trình xây dựng hệ thống gợi ý tại Hasaki.vn được chia thành hai phương pháp chính:
         1. **Content-Based Filtering**: Gợi ý sản phẩm dựa trên nội dung mô tả của sản phẩm.
@@ -140,7 +144,7 @@ elif page == "Quy trình xây dựng hệ thống":
 
     # Tab Crawl Data
     with tab1:
-        st.subheader("Crawl Data từ Hasaki.vn")
+        st.title("Crawl Data từ Hasaki.vn")
 
         with st.expander("Code cào dữ liệu (Click để mở)"):
             st.code("""
@@ -235,17 +239,24 @@ elif page == "Quy trình xây dựng hệ thống":
         try:
             df_sample = pd.read_csv('data/San_pham_new.csv').head()
             df_sample['ma_san_pham'] = df_sample['ma_san_pham'].astype(str)
+            
+            # Định dạng giá bán và giá gốc
+            for col in ['gia_ban', 'gia_goc']:
+                if col in df_sample.columns:
+                    df_sample[col] = df_sample[col].apply(
+                        lambda x: f"{int(x):,}" if pd.notnull(x) and str(x).isdigit() else x
+                    )
+
+            # Hiển thị dữ liệu đã định dạng
             st.dataframe(df_sample)
         except FileNotFoundError:
             st.warning("Không tìm thấy file `San_pham_new.csv`. Vui lòng chạy mã cào dữ liệu trước.")
-
 
     # Tab Content-Based Filtering
     with tab2:
         # Streamlit layout
         st.title("Content-Based Filtering: Quy trình xây dựng và phân tích")
 
-        st.write("### Các bước tiền xử lý:")
         st.markdown("""
         1. **Đọc dữ liệu từ các tệp CSV:**
             - **San_pham.csv:** Chứa thông tin sản phẩm (tên, mô tả, giá, điểm đánh giá...).
@@ -253,11 +264,11 @@ elif page == "Quy trình xây dựng hệ thống":
         2. **Làm sạch dữ liệu và tiền xử lý:**
             - Loại bỏ stopwords, ký tự đặc biệt (Tokenize).
             - Kết hợp tên sản phẩm, mô tả và phân loại để tạo nội dung phong phú hơn.
+            - Tính **`so_sao_trung_binh`** cho mỗi sản phẩm bằng cách nhóm theo **`ma_san_pham`** từ bảng **`Danh_gia.csv`**.
+            - Gộp thông tin **`so_sao_trung_binh`** vào file **`San_pham.csv`** để tạo một bảng tổng hợp.
         3. **Trích xuất đặc trưng:**
             - Sử dụng **`Gensim`** với **`TF-IDF`** để tính toán mức độ quan trọng của từ trong mô tả sản phẩm.
             - Tạo ma trận tương tự (**`ma trận sparse`**) dựa trên nội dung.
-            - Tính **`so_sao_trung_binh`** cho mỗi sản phẩm bằng cách nhóm theo **`ma_san_pham`** từ bảng **`Danh_gia.csv`**.
-            - Gộp thông tin **`so_sao_trung_binh`** vào file **`San_pham.csv`** để tạo một bảng tổng hợp.
         4. **Tính toán đặc trưng:**
             - Tính toán điểm tổng hợp cho từng sản phẩm bằng cách kết hợp điểm tương tự nội dung (**`similarity score`**) và điểm đánh giá trung bình (**`average rating`**). Dùng điểm tổng hợp này để xác định các sản phẩm tương tự nhất nhưng vẫn đảm bảo ưu tiên các sản phẩm có đánh giá tốt hơn.
             - Sắp xếp và trả về các sản phẩm phù hợp nhất.
@@ -322,6 +333,37 @@ elif page == "Quy trình xây dựng hệ thống":
         - "không", "xuất", "h": Đây là những từ có khả năng không mang lại ý nghĩa đặc biệt cho mô tả sản phẩm, đặc biệt từ như "h" hoặc "không" có thể bị xem là stopwords.
         """)
 
+        # Phần chọn model
+        st.write("### Lựa chọn model cho Content-Based Filtering")
+
+        # Mô tả chọn model
+        st.markdown("""
+        Để xây dựng mô hình Content-Based Filtering, chúng tôi đã thử nghiệm và so sánh giữa hai phương pháp chính:
+
+        1. **Gensim (TF-IDF):** 
+            - Sử dụng TF-IDF để vector hóa nội dung mô tả sản phẩm.
+            - Tính toán mức độ tương tự dựa trên ma trận sparse.
+        2. **Cosine Similarity:**
+            - Vector hóa mô tả sản phẩm bằng Bag-of-Words (BOW).
+            - Tính toán mức độ tương tự giữa các sản phẩm bằng Cosine Similarity.
+        """)
+
+        # Thêm đánh giá ưu, nhược điểm
+        st.write("### Đánh giá giữa các phương pháp")
+        st.markdown("""
+        | **Model**            | **Ưu điểm**                                                                                   | **Nhược điểm**                                                                 |
+        |-----------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+        | **Gensim**            | - Tối ưu trên dữ liệu lớn nhờ TF-IDF và ma trận sparse.                                       | - Độ đa dạng gợi ý thấp.                                                       |
+        |                       | - Kết hợp tốt giữa nội dung và điểm đánh giá trung bình.                                      | - Yêu cầu tiền xử lý dữ liệu tốt để đạt hiệu quả.                              |
+        | **Cosine Similarity** | - Nhanh hơn và phù hợp trên tập dữ liệu nhỏ hoặc trung bình (<10,000 sản phẩm).               | - Hiệu suất giảm trên tập dữ liệu lớn do tính toán toàn bộ ma trận tương tự.   |
+        |                       | - Độ bao phủ và đa dạng sản phẩm gợi ý tốt hơn Gensim.                                        | - Phụ thuộc nhiều vào vector hóa nội dung, không phân biệt trọng số từ quan trọng. |
+        """)
+
+        st.markdown("""
+        **Lựa chọn:** Dựa trên đánh giá, chúng tôi chọn **Gensim** vì khả năng tối ưu trên dữ liệu lớn (>10,000 sản phẩm) và hiệu quả cao trong việc kết hợp điểm tương tự nội dung với điểm đánh giá trung bình.
+        """)
+
+
         # Tab Collaborative Filtering
         with tab3:
             # Tiêu đề
@@ -338,15 +380,19 @@ elif page == "Quy trình xây dựng hệ thống":
                 - Lọc các sản phẩm và người dùng có ít đánh giá để giảm tính đa chiều.
             3. **Huấn luyện mô hình:**
                 - Sử dụng thuật toán **`KNNBaseline`** từ thư viện **`Surprise`** để xây dựng mô hình dự đoán đánh giá sao của khách hàng cho các sản phẩm chưa đánh giá.
-                - Lưu mô hình đã huấn luyện vào file để sử dụng cho gợi ý.
+                - Lưu mô hình **`collaborative_model.pkl.gz`** đã huấn luyện vào file để sử dụng cho gợi ý.
             4. **Gợi ý sản phẩm:**
                 - Dựa trên mô hình đã huấn luyện, dự đoán điểm số và đề xuất các sản phẩm phù hợp.
             """)
 
-            st.write("### Dữ liệu trước và sau khi xử lý:")
             # Đọc dữ liệu
             raw_data = pd.read_csv("data/Danh_gia.csv")
+            raw_data['ma_khach_hang'] = raw_data['ma_khach_hang'].astype(str)
+            raw_data['ma_san_pham'] = raw_data['ma_san_pham'].astype(str)
             processed_data = pd.read_csv("data/collaborative_full_data_part1.csv")
+            processed_data['id'] = processed_data['id'].astype(str)
+            processed_data['ma_khach_hang'] = processed_data['ma_khach_hang'].astype(str)
+            processed_data['ma_san_pham'] = processed_data['ma_san_pham'].astype(str)
 
             # Hiển thị dữ liệu trước xử lý
             st.write("#### Dữ liệu gốc:")
@@ -384,6 +430,34 @@ elif page == "Quy trình xây dựng hệ thống":
             **Nhận xét:**
             - Đa phần khách hàng đánh giá dưới 25 lượt.
             - Một số khách hàng tích cực đánh giá lên đến 70 lượt.
+            """)
+
+            # Phần chọn thuật toán
+            st.write("### Lựa chọn thuật toán cho mô hình Surprise")
+
+            # Thêm mô tả
+            st.markdown("""
+            Để lựa chọn thuật toán tối ưu nhất cho mô hình gợi ý, chúng tôi đã thực hiện chạy và đánh giá **11 thuật toán khác nhau** dựa trên chỉ số **RMSE (Root Mean Square Error)**. 
+            Kết quả cho thấy, các thuật toán thuộc nhóm **KNN** đạt chỉ số RMSE thấp nhất (khoảng **0.55**) so với các thuật toán còn lại.
+
+            Vì vậy, chúng tôi chọn sử dụng **KNNBaseline**, vì thuật toán này không chỉ đạt hiệu quả cao mà còn phù hợp với dữ liệu của Hasaki.
+            """)
+
+            # Hiển thị hình ảnh đánh giá RMSE của các thuật toán
+            st.image("banner/model.png", use_column_width=False, width=400, caption="So sánh RMSE giữa các thuật toán")
+
+            # So sánh giữa ALS và Surprise
+            st.write("### Đánh giá lựa chọn giữa ALS và Surprise")
+            st.markdown("""
+            Để đưa ra quyết định giữa **ALS** và **Surprise**, chúng tôi so sánh dựa trên ba tiêu chí:
+
+            | **Tiêu chí**        | **ALS**                                     | **Surprise**                             |
+            |----------------------|---------------------------------------------|------------------------------------------|
+            | **Mục đích**        | Phân tích ma trận, tối ưu cho dữ liệu lớn.  | Thử nghiệm nhanh các thuật toán gợi ý.   |
+            | **Hiệu suất**       | Phù hợp hơn trên dữ liệu lớn, thưa.         | Phù hợp với dữ liệu vừa và nhỏ.          |
+            | **RMSE**            | 0.697868                                   | **0.556424**                            |
+
+            **Kết luận:** Với tập dữ liệu hiện tại, **Surprise** là lựa chọn tối ưu hơn do chỉ số **RMSE** thấp hơn, và khả năng triển khai nhanh các thuật toán như **KNNBaseline**.
             """)
 
 # Page 3: Hệ thống gợi ý sản phẩm
