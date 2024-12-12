@@ -444,7 +444,7 @@ elif page == "Quy trình xây dựng hệ thống":
             """)
 
             # Hiển thị hình ảnh đánh giá RMSE của các thuật toán
-            st.image("banner/model.png", use_column_width=False, width=400, caption="So sánh RMSE giữa các thuật toán")
+            st.image("banner/model.png", use_column_width=False, width=550, caption="So sánh RMSE giữa các thuật toán")
 
             # So sánh giữa ALS và Surprise
             st.write("### Đánh giá lựa chọn giữa ALS và Surprise")
