@@ -546,7 +546,7 @@ elif page == "Hệ thống gợi ý sản phẩm":
                 gia_goc = selected_product_data.get('gia_goc', 0)
                 tab_info, tab_desc = st.tabs(["Thông tin chi tiết", "Mô tả sản phẩm"])
                 with tab_info:
-                    st.markdown(f"**Mã sản phẩm:** {selected_product_data['ma_san_pham']}")
+                    st.markdown(f"**Mã sản phẩm:** <span style='color: blue;'>{selected_product_data['ma_san_pham']}</span>", unsafe_allow_html=True)
                     st.markdown(f"**Giá bán:** <span style='color: red; font-size: 1.2em;'>{gia_ban:,.0f} ₫</span>", unsafe_allow_html=True)
                     st.markdown(f"<span style='text-decoration: line-through; color: gray; font-size: 0.8em;'>Giá gốc: {gia_goc:,.0f} ₫</span>", unsafe_allow_html=True)
                     # Hiển thị điểm đánh giá dưới dạng ngôi sao
