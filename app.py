@@ -80,14 +80,30 @@ st.markdown("""
         border-radius: 10px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
+    .image-caption {
+        text-align: center;
+        font-size: 15px;
+        font-weight: semibold;
+        margin-top: 5px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # Sidebar thông tin nhóm
 st.sidebar.title("Thông tin nhóm thực hiện")
-st.sidebar.write("""#### Thành viên thực hiện:
-- Lê Quỳnh Minh Dung
-- Nguyễn Thùy Trang""")
+st.sidebar.write("""#### Thành viên thực hiện:""")
+col1, col2 = st.sidebar.columns(2)
+
+# Thành viên 1
+with col1:
+    st.image("banner/Dung.jpg", use_column_width=True)
+    st.markdown("<div class='image-caption'>Lê Quỳnh Minh Dung</div>", unsafe_allow_html=True)
+
+# Thành viên 2
+with col2:
+    st.image("banner/Trang.jpg", use_column_width=True)
+    st.markdown("<div class='image-caption'>Nguyễn Thùy Trang</div>", unsafe_allow_html=True)
+
 st.sidebar.write("""#### Giảng viên hướng dẫn: 
 - Cô Khuất Thùy Phương""")
 st.sidebar.write("""#### 📈 Thời gian báo cáo: 16/12/2024""")
@@ -107,25 +123,42 @@ if page == "Giới thiệu":
 
     # Cột 1: Hiển thị logo
     with col1:
-        st.image("banner/Logo.png", use_column_width=True, width=100, caption="")
+        st.image("banner/Logo.png", use_column_width=True, width=200, caption="")
 
     # Cột 2: Hiển thị phần "Về Hasaki"
     with col2:
         st.subheader("💄 Về **`Hasaki.vn`**")
-        st.write("""
-            Hasaki.vn cam kết mang đến những sản phẩm làm đẹp và chăm sóc da tốt nhất cho khách hàng.
-            Với trọng tâm là chất lượng và sự hài lòng của khách hàng, Hasaki hướng đến việc làm đẹp trở nên dễ tiếp cận với mọi người.
-        """)
+        st.markdown("""
+            <p style='text-align: justify;'>
+                Hasaki.vn cam kết mang đến những sản phẩm làm đẹp và chăm sóc da tốt nhất cho khách hàng.
+                Với trọng tâm là chất lượng và sự hài lòng của khách hàng, Hasaki hướng đến việc làm đẹp trở nên dễ tiếp cận với mọi người.
+            </p>
+        """, unsafe_allow_html=True)
+
+        st.subheader("❓ Vấn đề cần giải quyết")
+        st.markdown("""
+            <ul style='text-align: justify;'>
+                <li>🌐 <strong>Đa dạng hóa gợi ý sản phẩm:</strong> Làm thế nào để gợi ý các sản phẩm mới mà khách hàng chưa từng tìm kiếm nhưng vẫn phù hợp với nhu cầu của họ?</li>
+                <li>📉 <strong>Tối ưu hóa tỷ lệ chuyển đổi:</strong> Nâng cao khả năng khách hàng chọn mua sản phẩm từ các gợi ý hệ thống.</li>
+                <li>🔍 <strong>Cá nhân hóa tối đa:</strong> Làm thế nào để hiểu rõ sở thích và hành vi mua sắm của từng khách hàng, từ đó đưa ra các đề xuất chính xác hơn?</li>
+                <li>⚙️ <strong>Quy mô dữ liệu lớn:</strong> Đảm bảo hiệu suất của hệ thống khi xử lý hàng triệu đánh giá và sản phẩm trên nền tảng.</li>
+            </ul>
+        """, unsafe_allow_html=True)
 
     st.subheader("🎯 Mục tiêu chính")
-    st.write("""
-        Hệ thống gợi ý (Recommend system) của chúng tôi được thiết kế nhằm:
-        - 🛍️ Giúp khách hàng của chúng tôi khám phá các sản phẩm phù hợp với sở thích của mình.
-        - 💡 Cải thiện trải nghiệm mua sắm bằng cách gợi ý các sản phẩm liên quan.
-        - 📊 Ứng dụng các thuật toán tiên tiến như **`Content-Based Filtering`** và **`Collaborative Filtering`** để mang lại gợi ý cá nhân hóa.
-    """)
+    st.markdown("""
+        <p style='text-align: justify;'>
+            Hệ thống gợi ý (Recommend system) của chúng tôi được thiết kế nhằm:
+        </p>
+        <ul style='text-align: justify;'>
+            <li>🛍️ Giúp khách hàng của chúng tôi khám phá các sản phẩm phù hợp với sở thích của mình.</li>
+            <li>💡 Cải thiện trải nghiệm mua sắm bằng cách gợi ý các sản phẩm liên quan.</li>
+            <li>📊 Ứng dụng các thuật toán tiên tiến như <strong>Content-Based Filtering</strong> và <strong>Collaborative Filtering</strong> để mang lại gợi ý cá nhân hóa.</li>
+        </ul>
+    """, unsafe_allow_html=True)
+
     st.markdown("<br>", unsafe_allow_html=True)  # Thêm khoảng trống
-    st.image("banner/images.png", use_column_width=True, width=800, caption="Mang đến trải nghiệm làm đẹp tuyệt vời")
+    st.image("banner/hasaki_footer.jpg", use_column_width=True, width=800, caption="")
 
 # Page 2: Quy trình xây dựng hệ thống
 elif page == "Quy trình xây dựng hệ thống":
