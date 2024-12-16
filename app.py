@@ -141,7 +141,7 @@ if page == "Giới thiệu":
                 <li>🌐 <strong>Đa dạng hóa gợi ý sản phẩm:</strong> Làm thế nào để gợi ý các sản phẩm mới mà khách hàng chưa từng tìm kiếm nhưng vẫn phù hợp với nhu cầu của họ?</li>
                 <li>📉 <strong>Tối ưu hóa tỷ lệ chuyển đổi:</strong> Nâng cao khả năng khách hàng chọn mua sản phẩm từ các gợi ý hệ thống.</li>
                 <li>🔍 <strong>Cá nhân hóa tối đa:</strong> Làm thế nào để hiểu rõ sở thích và hành vi mua sắm của từng khách hàng, từ đó đưa ra các đề xuất chính xác hơn?</li>
-                <li>⚙️ <strong>Quy mô dữ liệu lớn:</strong> Đảm bảo hiệu suất của hệ thống khi xử lý hàng triệu đánh giá và sản phẩm trên nền tảng.</li>
+                <li>⚙️ <strong>Đảm bảo tốc độ xử lý:</strong> Đảm bảo hiệu suất của hệ thống khi xử lý các đánh giá và sản phẩm trên nền tảng.</li>
             </ul>
         """, unsafe_allow_html=True)
 
